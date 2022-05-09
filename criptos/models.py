@@ -3,6 +3,7 @@ import requests
 from config import MONEDAS, ENDPOINT, API_KEY
 #from errores import APIError
 import sqlite3
+from datetime import datetime, date
 
 """class Gestiona_Cambio():
     def __init__(self, moneda_from, moneda_to):
@@ -97,18 +98,36 @@ class Gestiona_Datos():
     #Consulta saldo para balance y para ver saldo disponible
     def consulta_saldo_from(self, moneda):
         return self.realiza_consulta("""
-                                        SELECT SUM(cantidad_from)
-                                        FROM movimientos
+                                        SELECT SUM(cantidad_from) AS suma_from
+                                        FROM movimientos 
                                         WHERE moneda_from = ? 
-                                    """, [moneda,])
+                                    """, (moneda,))
     
     #Consulta saldo para balance
     def consulta_saldo_to(self, moneda):
         return self.realiza_consulta("""
-                                        SELECT SUM(cantidad_to)
-                                        FROM movimientos
+                                        SELECT SUM(cantidad_to) AS suma_to
+                                        FROM movimientos AS suma_to
                                         WHERE moneda_to = ? 
-                                    """, (moneda,))       
+                                    """, (moneda,))
+
+    #Coger fecha y hora
+    def fecha_hora(self):
+        fecha = date.today()
+        fecha = fecha.strftime("%d-%m-%Y")
+        hora = datetime.now()
+        hora = hora.strftime("%H:%M")
+        datos_tiempo = []
+        datos_tiempo.append(fecha)
+        datos_tiempo.append(hora)
+        return datos_tiempo
+
+    #Crear nuevo movimiento
+    def nuevo_movimiento(self, parametros):
+        self.realiza_consulta("""
+                                INSERT INTO movimientos (date, time, moneda_from, cantidad_from, moneda_to, cantidad_to )
+                                VALUES(?, ?, ?, ?, ?, ?)
+                            """, parametros)
 
 
 
